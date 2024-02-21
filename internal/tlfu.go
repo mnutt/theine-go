@@ -273,8 +273,11 @@ func (t *TinyLfu[K, V]) evictFromWindow() *Entry[K, V] {
 }
 
 func (t *TinyLfu[K, V]) admit(candidateKey, victimKey K) bool {
-	victimFreq := t.sketch.Estimate(t.hasher.hash(victimKey))
-	candidateFreq := t.sketch.Estimate(t.hasher.hash(candidateKey))
+	victimHash, _ := t.hasher.hash(victimKey)
+	candidateHash, _ := t.hasher.hash(candidateKey)
+	victimFreq := t.sketch.Estimate(victimHash)
+	candidateFreq := t.sketch.Estimate(candidateHash)
+
 	if candidateFreq > victimFreq {
 		return true
 	} else if candidateFreq >= ADMIT_HASHDOS_THRESHOLD {

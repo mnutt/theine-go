@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -106,7 +107,7 @@ func TestStore_DoorKeeperDynamicSize(t *testing.T) {
 	shard := store.shards[0]
 	require.True(t, shard.dookeeper.Capacity == 512)
 	for i := 0; i < 5000; i++ {
-		shard.set(i, &Entry[int, int]{})
+		shard.set(strconv.Itoa(i), &Entry[int, int]{})
 	}
 	require.True(t, shard.dookeeper.Capacity > 100000)
 }
@@ -134,7 +135,7 @@ func TestStore_GetExpire(t *testing.T) {
 	store := NewStore[int, int](1000, false, true, nil, nil, nil, 0, 0, nil)
 	defer store.Close()
 
-	_, i := store.index(123)
+	_, i, _ := store.index(123)
 	fakeNow := store.timerwheel.clock.NowNano() - 100*10e9
 	testNow := store.timerwheel.clock.NowNano()
 	entry := &Entry[int, int]{
@@ -143,7 +144,8 @@ func TestStore_GetExpire(t *testing.T) {
 	}
 	entry.expire.Store(fakeNow)
 
-	store.shards[i].hashmap[123] = entry
+	_, strKey := store.hasher.hash(entry.key)
+	store.shards[i].hashmap[strKey] = entry
 	store.policyMu.Lock()
 
 	// already exprired
@@ -174,7 +176,7 @@ func TestStore_SinkWritePolicyWeight(t *testing.T) {
 	defer store.Close()
 
 	entry := &Entry[int, int]{key: 1, value: 1}
-	h := store.hasher.hash(1)
+	h, _ := store.hasher.hash(1)
 
 	// wright change 5 -> 1 -> 8
 	store.sinkWrite(WriteBufItem[int, int]{

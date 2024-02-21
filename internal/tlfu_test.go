@@ -317,13 +317,15 @@ func TestTlfu_Weight(t *testing.T) {
 				case TestEventGet:
 					for i := 0; i < event.value; i++ {
 						entry := em[event.key]
+						hash, _ := hasher.hash(event.key)
 						tlfu.Access(ReadBufItem[int, int]{
 							entry: entry,
-							hash:  tlfu.hasher.hash(event.key),
+							hash:  hash,
 						})
 					}
 				case TestEventFreq:
-					tlfu.sketch.Addn(hasher.hash(event.key), event.value)
+					hash, _ := hasher.hash(event.key)
+					tlfu.sketch.Addn(hash, event.value)
 				case TestEventSet:
 					entry := &Entry[int, int]{
 						key: event.key, value: event.key,
@@ -440,9 +442,10 @@ func TestTlfu_Adaptive(t *testing.T) {
 
 			for i := 0; i < 80; i++ {
 				entry := em[i]
+				hash, _ := tlfu.hasher.hash(i)
 				tlfu.Access(ReadBufItem[int, int]{
 					entry: entry,
-					hash:  tlfu.hasher.hash(i),
+					hash:  hash,
 				})
 			}
 
@@ -505,9 +508,10 @@ func TestTlfu_AdaptiveAmountRemain(t *testing.T) {
 
 	for i := 0; i < 80; i++ {
 		entry := em[i]
+		hash, _ := tlfu.hasher.hash(i)
 		tlfu.Access(ReadBufItem[int, int]{
 			entry: entry,
-			hash:  tlfu.hasher.hash(i),
+			hash:  hash,
 		})
 	}
 

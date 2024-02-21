@@ -13,9 +13,10 @@ type Foo struct {
 
 func TestStringKey(t *testing.T) {
 	hasher := NewHasher[string](nil)
-	h := hasher.hash(strconv.Itoa(123456))
+	h, _ := hasher.hash(strconv.Itoa(123456))
 	for i := 0; i < 10; i++ {
-		require.Equal(t, h, hasher.hash(strconv.Itoa(123456)))
+		ih, _ := hasher.hash(strconv.Itoa(123456))
+		require.Equal(t, h, ih)
 	}
 }
 
@@ -29,17 +30,19 @@ func TestStructStringKey(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		foo := Foo{Bar: strconv.Itoa(123456)}
 		if h1 == 0 {
-			h1 = hasher1.hash(foo)
+			h1, _ = hasher1.hash(foo)
 		} else {
-			require.NotEqual(t, h1, hasher1.hash(foo))
+			h1i, _ := hasher1.hash(foo)
+			require.NotEqual(t, h1, h1i)
 		}
 	}
 	for i := 0; i < 10; i++ {
 		foo := Foo{Bar: strconv.Itoa(123456)}
 		if h2 == 0 {
-			h2 = hasher2.hash(foo)
+			h2, _ = hasher2.hash(foo)
 		} else {
-			require.Equal(t, h2, hasher2.hash(foo))
+			h2i, _ := hasher2.hash(foo)
+			require.Equal(t, h2, h2i)
 		}
 	}
 }

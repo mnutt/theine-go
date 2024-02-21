@@ -28,9 +28,10 @@ func BenchmarkPolicy_Read(b *testing.B) {
 	}
 	for _, wi := range witems {
 		store.policy.Set(wi.entry)
+		hash, _ := store.hasher.hash(wi.entry.key)
 		ritems = append(ritems, ReadBufItem[uint64, bool]{
 			entry: wi.entry,
-			hash:  store.hasher.hash(wi.entry.key),
+			hash:  hash,
 		})
 	}
 
