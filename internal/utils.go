@@ -28,7 +28,7 @@ func NewHasher[K comparable](stringKeyFunc func(K) string) *Hasher[K] {
 	return h
 }
 
-func (h *Hasher[K]) hash(key K) uint64 {
+func (h *Hasher[K]) hash(key K) (uint64, string) {
 	var strKey string
 	if h.kfunc != nil {
 		strKey = h.kfunc(key)
@@ -40,7 +40,7 @@ func (h *Hasher[K]) hash(key K) uint64 {
 			len  int
 		}{unsafe.Pointer(&key), h.ksize}))
 	}
-	return xxh3.HashString(strKey)
+	return xxh3.HashString(strKey), strKey
 }
 
 // RoundUpPowerOf2 is based on https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2.

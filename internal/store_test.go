@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -106,7 +107,7 @@ func TestStore_DoorKeeperDynamicSize(t *testing.T) {
 	shard := store.shards[0]
 	require.True(t, shard.dookeeper.Capacity == 512)
 	for i := 0; i < 5000; i++ {
-		shard.set(i, &Entry[int, int]{})
+		shard.set(strconv.Itoa(i), &Entry[int, int]{})
 	}
 	require.True(t, shard.dookeeper.Capacity > 100000)
 }
